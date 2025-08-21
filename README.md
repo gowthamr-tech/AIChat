@@ -1,7 +1,7 @@
-AI Chat API with WebSocket Context Memory
+🤖 AI Chat API with WebSocket Context Memory
 A real-time WebSocket-based chat API that maintains conversation context using short-term memory storage. Supports both streaming and complete responses from OpenAI's GPT models.
 
-Features
+✨ Features
 🚀 WebSocket-based real-time communication
 
 🧠 Context-aware conversations with 5-message memory
@@ -14,14 +14,14 @@ Features
 
 🔌 OpenAI Integration with GPT-4o-mini model
 
-Prerequisites
+📋 Prerequisites
 Node.js 18+
 
 PostgreSQL database
 
 OpenAI API account and API key
 
-Quick Start
+🚀 Quick Start
 1. Installation
 bash
 # Clone the repository
