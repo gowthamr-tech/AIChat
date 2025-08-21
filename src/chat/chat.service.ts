@@ -18,7 +18,6 @@ export class ChatService {
     mode: string,
     onStream?: (partial: string) => void,
   ) {
-    console.log('Mode', mode);
     //session creation or update
     await this.prisma.session.upsert({
       where: {
@@ -54,12 +53,6 @@ export class ChatService {
         if (onStream) onStream(partial);
       });
     }
-    let fullResponse;
-    if (mode == MODE.COMPLETE) {
-      fullResponse = await this.ai.completeChat(context);
-      console.log('Full Response we got', fullResponse);
-
-      return fullResponse;
-    }
+    if (mode == MODE.COMPLETE) return await this.ai.completeChat(context);
   }
 }
