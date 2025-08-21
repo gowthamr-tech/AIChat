@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AiService } from 'src/ai/ai.service';
 import { ChatCompletionMessageParam } from 'openai/resources';
+import { MODE } from 'src/shared/shared.entity';
 
 @Injectable()
 export class ChatService {
@@ -14,8 +15,11 @@ export class ChatService {
     sessionId: string,
     messageId: string,
     message: string,
-    onStream: (partial: string) => void,
+    mode: string,
+    onStream?: (partial: string) => void,
   ) {
+    console.log('Mode', mode);
+    //session creation or update
     await this.prisma.session.upsert({
       where: {
         id: sessionId,
@@ -24,10 +28,12 @@ export class ChatService {
       create: { id: sessionId },
     });
 
+    //message save
     await this.prisma.message.create({
       data: { sessionId, role: 'user', content: message },
     });
 
+    //get history latest 5 messages
     const history = await this.prisma.message.findMany({
       where: { sessionId },
       orderBy: { createdAt: 'desc' },
@@ -43,39 +49,17 @@ export class ChatService {
       }));
 
     //Call AI
-    await this.ai.streamChat(context, async (partial) => {
-      onStream(partial);
-    });
-    console.log('message', message, 'sessionid', sessionId);
+    if (mode == MODE.STREAM) {
+      await this.ai.streamChat(context, async (partial) => {
+        if (onStream) onStream(partial);
+      });
+    }
+    let fullResponse;
+    if (mode == MODE.COMPLETE) {
+      fullResponse = await this.ai.completeChat(context);
+      console.log('Full Response we got', fullResponse);
 
-    //save final AI response
-    await this.prisma.session.upsert({
-      where: { id: sessionId },
-      update: {},
-      create: { id: sessionId },
-    });
-
-    // setTimeout(()=>2)
-    // await this.prisma.message.create({
-    //   data: { sessionId, role: 'user', content: message },
-    // });
-
-    // await this.prisma.message.create({
-    //   data: {
-    //     sessionId,
-    //     role: 'assistant',
-    //     content: '[final response aggregated]',
-    //   },
-    // });
-
-    await this.prisma.session.upsert({
-      where: { id: sessionId },
-      update: {},
-      create: { id: sessionId }, // add required fields
-    });
-
-    // await this.prisma.message.create({
-    //   data: { sessionId, role: 'user', content: message },
-    // });
+      return fullResponse;
+    }
   }
 }

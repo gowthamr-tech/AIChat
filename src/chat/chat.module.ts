@@ -5,7 +5,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { AiService } from 'src/ai/ai.service';
 
 @Module({
-  imports:[PrismaModule],
-  providers: [ChatGateway, ChatService,AiService],
+  imports: [PrismaModule],
+  providers: [ChatGateway, ChatService, AiService],
 })
 export class ChatModule {}
