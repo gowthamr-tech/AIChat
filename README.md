@@ -38,12 +38,13 @@ Edit your .env file:
 
 bash
 # Database
-DATABASE_URL="postgresql://username:password@localhost:5432/ai_chat_db"
+DATABASE_URL="postgresql://postgres:rajagowtham123
+@db.hhnfvbuslutlzwrnpjvh.supabase.co:5432/postgres"
 
 # OpenAI API Key
-OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_API_KEY=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
 
-# Server port (optional)
+# Server port 
 PORT=3000
 3. Database Setup
 bash
