@@ -6,7 +6,7 @@ dotenv.config();
 
 @Injectable()
 export class AiService {
-  private openai = new OpenAI({ apiKey: "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" });
+  private openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   async streamChat(
     messages: ChatCompletionMessageParam[],
