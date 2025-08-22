@@ -19,6 +19,8 @@ export class AiService {
       stream: true,
     });
 
+
+    console.log("AI Returned")
     for await (const res of response) {
       const token = res.choices[0]?.delta?.content || '';
       if (token) {
