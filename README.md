@@ -1,66 +1,150 @@
-🤖 AI Chat API with WebSocket Context Memory
-A real-time WebSocket-based chat API that maintains conversation context using short-term memory storage. Supports both streaming and complete responses from OpenAI's GPT models.
+# AIChat
 
-✨ Features
-🚀 WebSocket-based real-time communication
+NestJS chat backend with WebSocket messaging, OpenAI-powered responses, and Prisma/PostgreSQL persistence for short-term conversation context.
 
-🧠 Context-aware conversations with 5-message memory
+## What It Does
 
-⚡ Dual response modes: Streaming & Complete responses
+- Accepts chat messages over a WebSocket endpoint at `/ws`
+- Supports two response modes: `Complete` and `Stream`
+- Stores sessions and messages in PostgreSQL with Prisma
+- Reuses the latest 5 messages from a session as context for each new response
 
-💾 PostgreSQL storage with Prisma ORM
+## Tech Stack
 
-✅ Input validation with class-validator DTOs
+- NestJS
+- WebSockets via `@nestjs/platform-ws`
+- OpenAI Node SDK
+- Prisma ORM
+- PostgreSQL
+- Jest for unit and e2e tests
 
-🔌 OpenAI Integration with GPT-4o-mini model
+## Project Structure
 
-📋 Prerequisites
-Node.js 18+
+```text
+src/
+  ai/       OpenAI integration
+  chat/     WebSocket gateway, DTOs, and chat orchestration
+  prisma/   Prisma service/module
+  shared/   Shared enums/types
+prisma/
+  schema.prisma
+  migrations/
+test/
+  app.e2e-spec.ts
+```
 
-PostgreSQL database
+## Requirements
 
-OpenAI API account and API key
+- Node.js 18+
+- npm
+- PostgreSQL database
+- OpenAI API key
 
-🚀 Quick Start
-1. Installation
-bash
-# Clone the repository
-git clone <your-repo-url>
-cd ai-chat-api
+## Environment Variables
 
-# Install dependencies
-npm install
+Create a `.env` file in the project root:
 
-# Set up environment variables
-cp .env.example .env
-2. Environment Configuration
-Edit your .env file:
-
-bash
-# Database
-DATABASE_URL="postgresql://postgres:rajagowtham123
-@db.hhnfvbuslutlzwrnpjvh.supabase.co:5432/postgres"
-
-# OpenAI API Key
-OPENAI_API_KEY=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
-
-# Server port 
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE"
+OPENAI_API_KEY="your_openai_api_key"
 PORT=3000
-3. Database Setup
-bash
-# Generate Prisma client
+```
+
+Do not commit real secrets to the repository.
+
+## Installation
+
+```bash
+npm install
+```
+
+## Database Setup
+
+Generate the Prisma client:
+
+```bash
 npx prisma generate
+```
 
-# Run database migrations
+Apply migrations:
+
+```bash
 npx prisma migrate dev
+```
 
-# Optional: Verify database connection
-npx prisma db push
-4. Running the Application
-bash
-# Development mode with hot reload
+## Running The App
+
+Development:
+
+```bash
 npm run start:dev
+```
 
-# Production build
+Production:
+
+```bash
 npm run build
 npm run start:prod
+```
+
+The HTTP server listens on `PORT` or `3000` by default.
+
+## API Surface
+
+### HTTP
+
+- `GET /` returns the default NestJS hello response
+
+### WebSocket
+
+- Path: `/ws`
+- Event: `message`
+
+Example payload:
+
+```json
+{
+  "messageId": "msg-001",
+  "sessionId": "session-123",
+  "message": "Tell me a joke",
+  "mode": "Complete"
+}
+```
+
+Valid `mode` values:
+
+- `Complete`
+- `Stream`
+
+Response shape sent back to the client:
+
+```json
+{
+  "sessionId": "session-123",
+  "messageId": "msg-001",
+  "response": "..."
+}
+```
+
+In `Stream` mode, the server sends multiple partial responses as tokens arrive.
+
+## Scripts
+
+```bash
+npm run build
+npm run start
+npm run start:dev
+npm run start:debug
+npm run start:prod
+npm run lint
+npm run test
+npm run test:watch
+npm run test:cov
+npm run test:e2e
+```
+
+## Notes
+
+- Chat context currently uses the latest 5 messages in a session
+- The configured model in the current codebase is `gpt-4o-mini`
+- Prisma schema defines `Session` and `Message` tables with cascade delete
